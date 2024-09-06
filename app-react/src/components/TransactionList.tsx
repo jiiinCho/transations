@@ -41,14 +41,31 @@ export const TransactionList = ({
       <h2 className='transaction-title'>Transaction History</h2>
       <ul>
         {transactions.map(({ transaction_id, account_id, amount }, i) => (
-          <li key={transaction_id} className='transaction-item'>
-            Transferred <span style={{ fontWeight: 700 }}>{amount}$</span> from
-            account <span className='transaction-highlight'>{account_id}</span>.
+          <li
+            key={transaction_id}
+            className='transaction-item'
+            data-type='transaction'
+          >
+            Transferred{' '}
+            <span style={{ fontWeight: 700 }} data-amount={amount}>
+              {amount}$
+            </span>{' '}
+            from account{' '}
+            <span
+              className='transaction-highlight'
+              data-account-id={account_id}
+            >
+              {account_id}
+            </span>
+            .
             {i === 0 && balance !== null && (
               <>
                 {' '}
                 The current balance is{' '}
-                <span style={{ fontWeight: 700 }}>{balance}</span>.
+                <span style={{ fontWeight: 700 }} data-balance={balance}>
+                  {balance}
+                </span>
+                .
               </>
             )}
           </li>
