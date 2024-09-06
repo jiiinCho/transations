@@ -11,11 +11,11 @@ export async function getById(req: Request, res: Response) {
       .json({ message: 'account_id missing or has incorrect type.' });
   }
 
-  const transaction = await accountsRepository.getById(account_id);
+  const account = await accountsRepository.getById(account_id);
 
-  if (!transaction) {
+  if (!account) {
     return res.status(404).json({ message: 'Account not found' });
   }
 
-  res.status(200).json(transaction);
+  res.status(200).json(account);
 }
