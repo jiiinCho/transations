@@ -2,48 +2,62 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTransaction } from './hook/useTransaction';
 import type { Transaction } from './types';
 import { TransactionForm } from './components/TransactionForm';
-import Banner from './components/Banner';
+import Alert from './components/Alert';
 import { TransactionList } from './components/TransactionList';
+import { Loader } from './components/Loader';
 
 function App() {
   const { createTransaction, getAllTransactions } = useTransaction();
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [error, setError] = useState<any[]>([]);
+  const [transactionId, setTransactionId] = useState<string | undefined>(
+    undefined
+  );
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     getAllTransactions()
-      .then((transactions) => setTransactions([...transactions]))
-      .catch(onError);
-  }, []);
+      .then((transactions) => {
+        setTransactions([...transactions]);
+      })
+      .catch(onError)
+      .finally(() => setLoading(false));
+  }, [transactionId]);
 
   const onError = (error: any) => {
-    setError([error, ...error.toString()]);
+    setError(error.toString());
     setTimeout(() => {
-      setError([]);
+      setError('');
     }, 3000);
   };
 
   const onSubmitTransaction = useCallback(
-    (accountId: string, amount: number) => {
-      createTransaction(accountId, Number(amount)).catch(onError);
-
-      if (!error.length) {
-        getAllTransactions()
-          .then((transactions) => setTransactions([...transactions]))
-          .catch(onError);
-      }
+    (accountId: string, amount: number, onReset: CallableFunction) => {
+      createTransaction(accountId, Number(amount))
+        .then(({ transaction_id }) => {
+          setTransactionId(transaction_id);
+          onReset();
+        })
+        .catch(onError);
     },
     []
   );
 
   return (
     <div>
-      {!!error.length &&
-        error.map((error, i) => <Banner key={i} text={error} isAlert={true} />)}
+      {error && <Alert text={error} isAlert={true} />}
       <section className='container'>
         <TransactionForm onSubmitTransaction={onSubmitTransaction} />
-        <TransactionList transactions={sortByTime(transactions)} />
+        {loading ? (
+          <Loader />
+        ) : (
+          <TransactionList
+            transactions={sortByTime(transactions)}
+            onError={onError}
+          />
+        )}
       </section>
     </div>
   );

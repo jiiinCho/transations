@@ -1,9 +1,12 @@
-import { useState } from 'react';
-import Banner from './Banner';
-import { useTransaction } from '../hook/useTransaction';
+import { useCallback, useState } from 'react';
+import './TransactionForm.css';
 
 type TransactionFormProps = {
-  onSubmitTransaction: (accountId: string, amount: number) => void;
+  onSubmitTransaction: (
+    accountId: string,
+    amount: number,
+    onReset: CallableFunction
+  ) => void;
 };
 
 export const TransactionForm = ({
@@ -27,10 +30,13 @@ export const TransactionForm = ({
       return;
     }
 
-    onSubmitTransaction(accountId, Number(amount));
+    onSubmitTransaction(accountId, Number(amount), onReset);
   };
 
   const onChange = (event: any) => {
+    setAccountError('');
+    setAmountError('');
+
     const {
       target: { name, value },
     } = event;
@@ -43,17 +49,17 @@ export const TransactionForm = ({
     }
   };
 
+  const onReset = useCallback(() => {
+    setAccountId('');
+    setAmount('');
+  }, []);
+
   return (
-    <article className='section'>
+    <article className='form'>
       <h1>Submit new transaction</h1>
-      <form onSubmit={onSubmit} className='form'>
-        <div style={{ paddingBottom: '16px' }}>
-          <label
-            htmlFor='account-id'
-            style={{ display: 'block', paddingBottom: '4px' }}
-          >
-            Account ID
-          </label>
+      <form onSubmit={onSubmit}>
+        <div className='form-item'>
+          <label htmlFor='account-id'>Account ID</label>
           <input
             id='account-id'
             data-type='account-id'
@@ -64,31 +70,27 @@ export const TransactionForm = ({
             onChange={onChange}
             className='form-input'
             required
-            style={{ width: '100%' }}
           />
-          {accountError && <p>{accountError}</p>}
+          {accountError && <p className='form-error'>{accountError}</p>}
         </div>
 
-        <div style={{ paddingBottom: '16px' }}>
-          <label
-            htmlFor='amount'
-            style={{ display: 'block', paddingBottom: '4px' }}
-          >
-            Amount
-          </label>
+        <div className='form-item'>
+          <label htmlFor='amount'>Amount</label>
           <input
+            id='amount'
             data-type='amount'
             name='amount'
             type='number'
             placeholder='Amount'
             value={amount}
-            className='form-input'
             onChange={onChange}
-            style={{ width: '100%' }}
+            className='form-input'
+            required
           />
-          {amountError && <p>{amountError}</p>}
+          {amountError && <p className='form-error'>{amountError}</p>}
         </div>
-        <div style={{ textAlign: 'center' }}>
+
+        <div className='form-button'>
           <input
             data-type='transaction-submit'
             className='form-btn auth-form-btn'

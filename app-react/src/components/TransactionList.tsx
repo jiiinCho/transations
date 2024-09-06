@@ -1,32 +1,36 @@
 import { useEffect, useState } from 'react';
 import { useTransaction } from '../hook/useTransaction';
 import { Transaction } from '../types';
+import './TransactionList.css';
 
 type TransactionListProps = {
   transactions: Transaction[];
+  onError: (error: any) => void;
 };
 
-export const TransactionList = ({ transactions }: TransactionListProps) => {
+export const TransactionList = ({
+  transactions,
+
+  onError,
+}: TransactionListProps) => {
   const { getAccountById } = useTransaction();
+
   const [balance, setBalance] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const lastTransaction = transactions[0];
-    if (!lastTransaction) return;
-
-    const accountId = lastTransaction.account_id;
+    const accountId = transactions[0]?.account_id;
+    if (!accountId) {
+      return;
+    }
 
     getAccountById(accountId)
       .then(({ balance }) => {
         setBalance(balance);
-        setError(null);
       })
       .catch((err) => {
-        console.error(err);
-        setError('Failed to fetch account balance');
+        onError(err);
       });
-  }, [transactions, getAccountById]);
+  }, [transactions]);
 
   if (!transactions.length) {
     return <p>No transactions available.</p>;
@@ -34,20 +38,22 @@ export const TransactionList = ({ transactions }: TransactionListProps) => {
 
   return (
     <section>
-      <h2>Transaction History</h2>
+      <h2 className='transaction-title'>Transaction History</h2>
       <ul>
-        {transactions.map(
-          ({ transaction_id, account_id, amount, created_at }, i) => (
-            <li key={transaction_id} className='item'>
-              {`Transferred ${amount}$ from account ${account_id}`}
-              {i === 0 && balance !== null && (
-                <span>{`. The current account balance is ${balance} `}</span>
-              )}
-            </li>
-          )
-        )}
+        {transactions.map(({ transaction_id, account_id, amount }, i) => (
+          <li key={transaction_id} className='transaction-item'>
+            Transferred <span style={{ fontWeight: 700 }}>{amount}$</span> from
+            account <span className='transaction-highlight'>{account_id}</span>.
+            {i === 0 && balance !== null && (
+              <>
+                {' '}
+                The current balance is{' '}
+                <span style={{ fontWeight: 700 }}>{balance}</span>.
+              </>
+            )}
+          </li>
+        ))}
       </ul>
-      {error && <p className='error'>{error}</p>}
     </section>
   );
 };

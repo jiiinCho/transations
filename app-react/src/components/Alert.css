@@ -1,0 +1,36 @@
+.alert-container {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+.alert {
+  min-width: 360px;
+  color: white;
+  padding: 24px;
+  border-radius: 8px;
+  position: relative;
+  /* Start off-screen to the left */
+  transform: translateX(100%);
+  /* Optional: make the animation smooth */
+  transition: transform 250ms ease-in-out;
+  animation: slide-in 250ms forwards;
+}
+
+/* Keyframes for the sliding animation */
+@keyframes slide-in {
+  from {
+    transform: translateX(100%); /* Starts off-screen */
+  }
+  to {
+    transform: translateX(0); /* Ends at its original position */
+  }
+}
+
+.alert-error {
+  background-color: red;
+}
+
+.alert-success {
+  background-color: green;
+}
