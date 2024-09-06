@@ -1,10 +1,10 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import 'express-async-errors';
 import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
-import transationsRouter from '../api/transations';
+import transactionsRouter from '../api/transactions';
 import accountsRouter from '../api/accounts';
 const app = express();
 
@@ -18,7 +18,7 @@ app.get('/ping', (req: Request, res: Response) => {
   res.status(200).send('The service is up and running');
 });
 
-app.use('/transations', transationsRouter);
+app.use('/transactions', transactionsRouter);
 app.use('/accounts', accountsRouter);
 
 app.get('*', (req: Request, res: Response) => {
