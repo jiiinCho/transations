@@ -1,38 +1,51 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import './App.css';
 import { useTransaction } from './hook/useTransaction';
 import type { Transaction } from './types';
+import { TransactionForm } from './components/TransactionForm';
+import Banner from './components/Banner';
+import { TransactionList } from './components/TransactionList';
 
 function App() {
-  const { getAllTransactions } = useTransaction();
+  const { createTransaction, getAllTransactions } = useTransaction();
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<any[]>([]);
 
   useEffect(() => {
     getAllTransactions()
-      .then((response) => setTransactions([...response]))
+      .then((transactions) => setTransactions([...transactions]))
       .catch(onError);
   }, []);
 
   const onError = (error: any) => {
-    setError(error.toString());
+    setError([error, ...error.toString()]);
     setTimeout(() => {
-      setError('');
+      setError([]);
     }, 3000);
   };
 
+  const onSubmitTransaction = useCallback(
+    (accountId: string, amount: number) => {
+      createTransaction(accountId, Number(amount)).catch(onError);
+
+      if (!error.length) {
+        getAllTransactions()
+          .then((transactions) => setTransactions([...transactions]))
+          .catch(onError);
+      }
+    },
+    []
+  );
+
   return (
     <div className='App'>
-      <header className='App-header'>
-        <h1 className='text-3xl font-bold underline'>Hello world!</h1>
-        {error && <p className='text-red-700'>{error || 'Error 💣'}</p>}
-        <ul>
-          {transactions.map(({ transaction_id }) => (
-            <p key={transaction_id}>{transaction_id}</p>
-          ))}
-        </ul>
-      </header>
+      {!!error.length &&
+        error.map((error, i) => <Banner key={i} text={error} isAlert={true} />)}
+      <section className='container'>
+        <TransactionForm onSubmitTransaction={onSubmitTransaction} />
+        <TransactionList transactions={transactions} />
+      </section>
     </div>
   );
 }
