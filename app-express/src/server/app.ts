@@ -4,7 +4,8 @@ import 'express-async-errors';
 import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
-import transationsRouter from '../api';
+import transationsRouter from '../api/transations';
+import accountsRouter from '../api/accounts';
 const app = express();
 
 app.use(cors());
@@ -16,7 +17,9 @@ app.use(morgan('tiny'));
 app.get('/ping', (req: Request, res: Response) => {
   res.status(200).send('The service is up and running');
 });
+
 app.use('/transations', transationsRouter);
+app.use('/accounts', accountsRouter);
 
 app.get('*', (req: Request, res: Response) => {
   res.status(404).send('404 Not Found');

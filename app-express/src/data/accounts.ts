@@ -14,3 +14,12 @@ let accounts: Account[] = [
 export async function getAll() {
   return accounts;
 }
+
+export async function getById(id: string) {
+  const found = accounts.find(({ account_id }) => account_id === id);
+  if (!found) {
+    return null;
+  }
+
+  return found;
+}
