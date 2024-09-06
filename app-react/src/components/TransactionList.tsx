@@ -5,35 +5,49 @@ import { Transaction } from '../types';
 type TransactionListProps = {
   transactions: Transaction[];
 };
+
 export const TransactionList = ({ transactions }: TransactionListProps) => {
   const { getAccountById } = useTransaction();
-  const [balance, setBalance] = useState();
+  const [balance, setBalance] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const accountId = transactions[transactions.length - 1]?.account_id;
-    if (!accountId) {
-      return;
-    }
+    const lastTransaction = transactions[0];
+    if (!lastTransaction) return;
+
+    const accountId = lastTransaction.account_id;
 
     getAccountById(accountId)
-      .then(({ balance }) => setBalance(balance))
-      .catch(console.error);
-  }, [transactions]);
+      .then(({ balance }) => {
+        setBalance(balance);
+        setError(null);
+      })
+      .catch((err) => {
+        console.error(err);
+        setError('Failed to fetch account balance');
+      });
+  }, [transactions, getAccountById]);
+
+  if (!transactions.length) {
+    return <p>No transactions available.</p>;
+  }
 
   return (
     <section>
-      <h2>Transaction history</h2>
+      <h2>Transaction History</h2>
       <ul>
-        {transactions.map(({ transaction_id, account_id, amount }, i) => {
-          if (i === 0) {
-            return (
-              <p
-                key={transaction_id}
-              >{`Transferred ${amount}$ from account ${account_id}. The current account balance is ${balance}`}</p>
-            );
-          }
-        })}
+        {transactions.map(
+          ({ transaction_id, account_id, amount, created_at }, i) => (
+            <li key={transaction_id} className='item'>
+              {`Transferred ${amount}$ from account ${account_id}`}
+              {i === 0 && balance !== null && (
+                <span>{`. The current account balance is ${balance} `}</span>
+              )}
+            </li>
+          )
+        )}
       </ul>
+      {error && <p className='error'>{error}</p>}
     </section>
   );
 };

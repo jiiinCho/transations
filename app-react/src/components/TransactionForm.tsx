@@ -44,11 +44,16 @@ export const TransactionForm = ({
   };
 
   return (
-    <article>
+    <article className='section'>
       <h1>Submit new transaction</h1>
       <form onSubmit={onSubmit} className='form'>
-        <label htmlFor='account-id'>
-          Account ID
+        <div style={{ paddingBottom: '16px' }}>
+          <label
+            htmlFor='account-id'
+            style={{ display: 'block', paddingBottom: '4px' }}
+          >
+            Account ID
+          </label>
           <input
             id='account-id'
             data-type='account-id'
@@ -59,11 +64,18 @@ export const TransactionForm = ({
             onChange={onChange}
             className='form-input'
             required
+            style={{ width: '100%' }}
           />
           {accountError && <p>{accountError}</p>}
-        </label>
-        <label htmlFor='amount'>
-          Amount
+        </div>
+
+        <div style={{ paddingBottom: '16px' }}>
+          <label
+            htmlFor='amount'
+            style={{ display: 'block', paddingBottom: '4px' }}
+          >
+            Amount
+          </label>
           <input
             data-type='amount'
             name='amount'
@@ -72,15 +84,18 @@ export const TransactionForm = ({
             value={amount}
             className='form-input'
             onChange={onChange}
+            style={{ width: '100%' }}
           />
+          {amountError && <p>{amountError}</p>}
+        </div>
+        <div style={{ textAlign: 'center' }}>
           <input
             data-type='transaction-submit'
             className='form-btn auth-form-btn'
             type='submit'
             onClick={onSubmit}
           />
-          {amountError && <p>{amountError}</p>}
-        </label>
+        </div>
       </form>
     </article>
   );

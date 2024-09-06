@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react';
-import './App.css';
 import { useTransaction } from './hook/useTransaction';
 import type { Transaction } from './types';
 import { TransactionForm } from './components/TransactionForm';
@@ -39,15 +38,22 @@ function App() {
   );
 
   return (
-    <div className='App'>
+    <div>
       {!!error.length &&
         error.map((error, i) => <Banner key={i} text={error} isAlert={true} />)}
       <section className='container'>
         <TransactionForm onSubmitTransaction={onSubmitTransaction} />
-        <TransactionList transactions={transactions} />
+        <TransactionList transactions={sortByTime(transactions)} />
       </section>
     </div>
   );
 }
 
 export default App;
+
+function sortByTime(transactions: Transaction[]) {
+  return transactions.sort(
+    (a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
+}
