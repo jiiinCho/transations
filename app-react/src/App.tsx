@@ -1,24 +1,37 @@
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
 import './App.css';
+import { useTransaction } from './hook/useTransaction';
+import type { Transaction } from './types';
 
 function App() {
+  const { getAllTransactions } = useTransaction();
+
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    getAllTransactions()
+      .then((response) => setTransactions([...response]))
+      .catch(onError);
+  }, []);
+
+  const onError = (error: any) => {
+    setError(error.toString());
+    setTimeout(() => {
+      setError('');
+    }, 3000);
+  };
+
   return (
     <div className='App'>
       <header className='App-header'>
-        <img src={logo} className='App-logo' alt='logo' />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className='App-link'
-          href='https://reactjs.org'
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          Learn React
-        </a>
-
         <h1 className='text-3xl font-bold underline'>Hello world!</h1>
+        {error && <p className='text-red-700'>{error || 'Error 💣'}</p>}
+        <ul>
+          {transactions.map(({ transaction_id }) => (
+            <p key={transaction_id}>{transaction_id}</p>
+          ))}
+        </ul>
       </header>
     </div>
   );
