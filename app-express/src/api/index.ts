@@ -1,10 +1,10 @@
-import express, { Request, Response } from "express";
+import express from 'express';
+import 'express-async-errors';
+import * as transationsController from '../controller/transations';
 
 const router = express.Router();
 
-router.get("/ping", (req: Request, res: Response) => {
-  res.send("pong")
-})
-
+// GET /transations
+router.get('/', transationsController.getAll);
 
 export default router;
